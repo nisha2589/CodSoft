@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BuildFirst — Learn Web Dev by Building</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,200&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:    #0e0c09;
+      --paper:  #f5f0e8;
+      --cream:  #ede7d5;
+      --sage:   #7a9e7e;
+      --rust:   #c0552a;
+      --gold:   #d4a932;
+      --muted:  #8a8070;
+      --mono:   'DM Mono', monospace;
+      --display:'Fraunces', serif;
+      --sans:   'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE GRAIN OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999;
+      opacity: .45;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 3rem;
+      background: var(--paper);
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .nav-logo {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -.02em;
+    }
+    .nav-logo span { color: var(--rust); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: .95rem;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: .05em;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--rust); }
+    .nav-cta {
+      background: var(--ink);
+      color: var(--paper);
+      font-family: var(--mono);
+      font-size: .92rem;
+      letter-spacing: .08em;
+      padding: .55rem 1.3rem;
+      border: none; cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .nav-cta:hover { background: var(--rust); }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-top: 80px;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .hero-left {
+      padding: 7rem 3rem 5rem 3.5rem;
+      border-right: 1.5px solid var(--ink);
+      display: flex; flex-direction: column; justify-content: center;
+      animation: fadeUp .9s ease both;
+    }
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: .88rem;
+      letter-spacing: .18em;
+      color: var(--rust);
+      text-transform: uppercase;
+      margin-bottom: 1.8rem;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .hero-tag::before {
+      content: '';
+      display: inline-block;
+      width: 24px; height: 1.5px;
+      background: var(--rust);
+    }
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(3rem, 5.5vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -.02em;
+      margin-bottom: 2rem;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--rust);
+    }
+    .hero-desc {
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 420px;
+      margin-bottom: 3rem;
+    }
+    .hero-actions { display: flex; gap: 1rem; align-items: center; }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--paper);
+      padding: .85rem 2rem;
+      font-family: var(--sans);
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      border: 1.5px solid var(--ink);
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .btn-primary:hover { background: var(--rust); border-color: var(--rust); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      padding: .85rem 2rem;
+      font-family: var(--sans);
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      border: 1.5px solid var(--ink);
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .btn-ghost:hover { background: var(--cream); }
+
+    .hero-right {
+      display: flex; flex-direction: column;
+      animation: fadeUp 1.1s ease both;
+    }
+    .hero-code-box {
+      flex: 1;
+      padding: 4rem 3rem;
+      display: flex; flex-direction: column; justify-content: center;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .code-label {
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      letter-spacing: .15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .code-block {
+      background: var(--ink);
+      color: #a8d8a0;
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      line-height: 1.9;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .code-block .kw  { color: #f4a261; }
+    .code-block .str { color: #81c995; }
+    .code-block .cm  { color: #6b7280; font-style: italic; }
+    .code-block .cursor {
+      display: inline-block;
+      width: 2px; height: 1em;
+      background: var(--gold);
+      animation: blink .85s step-end infinite;
+      vertical-align: text-bottom;
+      margin-left: 1px;
+    }
+    .hero-stat-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .stat-cell {
+      padding: 2rem 2.5rem;
+      border-top: 1.5px solid var(--ink);
+    }
+    .stat-cell:first-child { border-right: 1.5px solid var(--ink); }
+    .stat-num {
+      font-family: var(--display);
+      font-size: 2.5rem;
+      font-weight: 300;
+      line-height: 1;
+      margin-bottom: .3rem;
+    }
+    .stat-num span { color: var(--rust); }
+    .stat-label {
+      font-family: var(--mono);
+      font-size: .88rem;
+      color: var(--muted);
+      letter-spacing: .08em;
+    }
+
+    /* ─── MARQUEE ─── */
+    .marquee-strip {
+      background: var(--ink);
+      color: var(--paper);
+      padding: .9rem 0;
+      overflow: hidden;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .marquee-inner {
+      display: flex;
+      white-space: nowrap;
+      animation: marquee 22s linear infinite;
+    }
+    .marquee-inner span {
+      font-family: var(--mono);
+      font-size: .92rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 0 2.5rem;
+    }
+    .marquee-inner .dot {
+      color: var(--gold);
+      padding: 0;
+      letter-spacing: 0;
+    }
+
+    /* ─── SKILLS SECTION ─── */
+    .skills {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .skills-label-col {
+      padding: 5rem 3rem;
+      border-right: 1.5px solid var(--ink);
+    }
+    .section-num {
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      letter-spacing: .2em;
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+    }
+    .section-title {
+      font-family: var(--display);
+      font-size: clamp(2.5rem, 3.5vw, 3.8rem);
+      font-weight: 300;
+      line-height: 1.1;
+    }
+    .section-title em { font-style: italic; color: var(--sage); }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .skill-card {
+      padding: 3rem;
+      border-bottom: 1.5px solid var(--ink);
+      border-right: 1.5px solid var(--ink);
+      transition: background .25s;
+      cursor: default;
+    }
+    .skill-card:nth-child(even) { border-right: none; }
+    .skill-card:nth-last-child(-n+2) { border-bottom: none; }
+    .skill-card:hover { background: var(--cream); }
+    .skill-icon {
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--rust);
+    }
+    .skill-card h3 {
+      font-family: var(--sans);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: .7rem;
+      letter-spacing: -.01em;
+    }
+    .skill-card p {
+      font-family: var(--mono);
+      font-size: .92rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .steps {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .step-card {
+      padding: 4.5rem 2.5rem;
+      border-right: 1.5px solid var(--ink);
+      position: relative;
+      overflow: hidden;
+      transition: background .25s;
+    }
+    .step-card:last-child { border-right: none; }
+    .step-card:hover { background: var(--cream); }
+    .step-bg-num {
+      position: absolute;
+      bottom: -1rem; right: .5rem;
+      font-family: var(--display);
+      font-size: 9rem;
+      font-weight: 800;
+      color: rgba(14,12,9,.05);
+      line-height: 1;
+      pointer-events: none;
+    }
+    .step-num {
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      letter-spacing: .18em;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .step-card h3 {
+      font-family: var(--display);
+      font-size: 1.95rem;
+      font-weight: 300;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+    .step-card h3 em { font-style: italic; }
+    .step-card p {
+      font-family: var(--mono);
+      font-size: .92rem;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+
+    /* ─── PROJECTS STRIP ─── */
+    .projects-section {
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .projects-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 3rem 3rem 2rem;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .projects-header h2 {
+      font-family: var(--display);
+      font-size: 2.5rem;
+      font-weight: 300;
+    }
+    .projects-header h2 em { font-style: italic; color: var(--sage); }
+    .projects-header a {
+      font-family: var(--mono);
+      font-size: .88rem;
+      letter-spacing: .1em;
+      color: var(--rust);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .projects-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .project-card {
+      padding: 3rem;
+      border-right: 1.5px solid var(--ink);
+      transition: background .25s;
+    }
+    .project-card:last-child { border-right: none; }
+    .project-card:hover { background: var(--cream); }
+    .project-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: .98rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      background: var(--sage);
+      color: var(--paper);
+      padding: .25rem .7rem;
+      margin-bottom: 1.2rem;
+    }
+    .project-card h3 {
+      font-family: var(--sans);
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: .7rem;
+    }
+    .project-card p {
+      font-family: var(--mono);
+      font-size: .92rem;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .project-skills {
+      display: flex; flex-wrap: wrap; gap: .4rem;
+    }
+    .project-skills span {
+      font-family: var(--mono);
+      font-size: .98rem;
+      letter-spacing: .06em;
+      border: 1px solid currentColor;
+      padding: .2rem .55rem;
+      color: var(--muted);
+    }
+
+    /* ─── TESTIMONIAL / QUOTE ─── */
+    .quote-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .quote-left {
+      padding: 6rem 3.5rem;
+      border-right: 1.5px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .quote-left blockquote {
+      font-family: var(--display);
+      font-size: clamp(1.9rem, 3vw, 2.9rem);
+      font-weight: 200;
+      font-style: italic;
+      line-height: 1.35;
+      margin-bottom: 2.5rem;
+    }
+    .quote-left blockquote em { color: var(--gold); font-style: normal; }
+    .quote-author {
+      font-family: var(--mono);
+      font-size: .9rem;
+      letter-spacing: .1em;
+      color: var(--muted);
+    }
+    .quote-right {
+      padding: 6rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .checklist { list-style: none; display: flex; flex-direction: column; gap: 1.2rem; }
+    .checklist li {
+      display: flex; gap: 1rem; align-items: flex-start;
+      font-family: var(--mono);
+      font-size: .98rem;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+    .check-icon {
+      flex-shrink: 0;
+      width: 20px; height: 20px;
+      background: var(--sage);
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-size: .88rem;
+      margin-top: 1px;
+    }
+
+    /* ─── CTA ─── */
+    .cta-section {
+      padding: 8rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border-bottom: 1.5px solid var(--ink);
+      background: var(--cream);
+    }
+    .cta-section h2 {
+      font-family: var(--display);
+      font-size: clamp(3rem, 5.5vw, 5.8rem);
+      font-weight: 300;
+      line-height: 1.05;
+      max-width: 700px;
+      margin-bottom: 2rem;
+    }
+    .cta-section h2 em { font-style: italic; color: var(--rust); }
+    .cta-section p {
+      font-family: var(--mono);
+      font-size: .98rem;
+      color: var(--muted);
+      max-width: 450px;
+      line-height: 1.75;
+      margin-bottom: 3rem;
+    }
+    .cta-input-row {
+      display: flex;
+      border: 1.5px solid var(--ink);
+      overflow: hidden;
+      width: 100%;
+      max-width: 460px;
+    }
+    .cta-input-row input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 1rem 1.2rem;
+      font-family: var(--mono);
+      font-size: .98rem;
+      color: var(--ink);
+    }
+    .cta-input-row button {
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      padding: 1rem 1.5rem;
+      font-family: var(--sans);
+      font-size: .95rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .cta-input-row button:hover { background: var(--rust); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 0;
+      padding: 5rem 3rem 3rem;
+    }
+    .footer-brand { padding-right: 4rem; }
+    .footer-brand .logo {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: 1.6rem;
+      letter-spacing: -.03em;
+      margin-bottom: 1rem;
+    }
+    .footer-brand .logo span { color: var(--rust); }
+    .footer-brand p {
+      font-family: var(--mono);
+      font-size: .9rem;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+    .footer-col h4 {
+      font-family: var(--sans);
+      font-size: .92rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .7rem; }
+    .footer-col ul li a {
+      font-family: var(--mono);
+      font-size: .9rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .footer-col ul li a:hover { color: var(--rust); }
+    .footer-bottom {
+      grid-column: 1 / -1;
+      border-top: 1.5px solid var(--ink);
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-bottom p {
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      letter-spacing: .06em;
+      color: var(--muted);
+    }
+    .footer-bottom .built {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      color: var(--muted);
+    }
+    .heart { color: var(--rust); }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .hero-left { padding: 5rem 1.5rem 3rem; }
+      .skills { grid-template-columns: 1fr; }
+      .skills-label-col { border-right: none; border-bottom: 1.5px solid var(--ink); padding: 3rem 1.5rem; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .skill-card { border-right: none !important; }
+      .steps { grid-template-columns: 1fr; }
+      .step-card { border-right: none; border-bottom: 1.5px solid var(--ink); }
+      .projects-row { grid-template-columns: 1fr; }
+      .project-card { border-right: none; border-bottom: 1.5px solid var(--ink); }
+      .quote-section { grid-template-columns: 1fr; }
+      .quote-left { border-right: none; border-bottom: 1.5px solid var(--ink); }
+      footer { grid-template-columns: 1fr 1fr; gap: 3rem; padding: 3rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Build<span>First</span></div>
+    <ul class="nav-links">
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#steps">Process</a></li>
+      <li><a href="#projects">Projects</a></li>
+    </ul>
+    <button class="nav-cta">Start Free →</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-tag">Beginner Web Development</div>
+      <h1>Build your first<br><em>landing page</em><br>from scratch.</h1>
+      <p class="hero-desc">
+        Master HTML & CSS fundamentals by doing—not watching. Learn layout, color, spacing, and creativity through one focused project that actually ships.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary">Start Building →</button>
+        <button class="btn-ghost">View Projects</button>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-code-box">
+        <div class="code-label">// your first CSS</div>
+        <div class="code-block">
+<span class="cm">/* Layout */</span><br>
+.<span class="kw">hero</span> {<br>
+&nbsp;&nbsp;<span class="kw">display</span>: <span class="str">flex</span>;<br>
+&nbsp;&nbsp;<span class="kw">padding</span>: <span class="str">4rem 2rem</span>;<br>
+&nbsp;&nbsp;<span class="kw">background</span>: <span class="str">#f5f0e8</span>;<br>
+&nbsp;&nbsp;<span class="kw">align-items</span>: <span class="str">center</span>;<br>
+}<br><br>
+.<span class="kw">hero h1</span> {<br>
+&nbsp;&nbsp;<span class="kw">font-size</span>: <span class="str">clamp(2rem, 5vw, 5rem)</span>;<br>
+&nbsp;&nbsp;<span class="kw">line-height</span>: <span class="str">1.1</span>;<br>
+}<span class="cursor"></span>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-strip">
+    <div class="marquee-inner">
+      <span>HTML</span><span class="dot">◆</span>
+      <span>CSS Flexbox</span><span class="dot">◆</span>
+      <span>CSS Grid</span><span class="dot">◆</span>
+      <span>Color Palette</span><span class="dot">◆</span>
+      <span>Typography</span><span class="dot">◆</span>
+      <span>Padding & Margin</span><span class="dot">◆</span>
+      <span>Responsive Design</span><span class="dot">◆</span>
+      <span>Box Model</span><span class="dot">◆</span>
+      <span>Semantic HTML</span><span class="dot">◆</span>
+      <span>Animations</span><span class="dot">◆</span>
+      <span>HTML</span><span class="dot">◆</span>
+      <span>CSS Flexbox</span><span class="dot">◆</span>
+      <span>CSS Grid</span><span class="dot">◆</span>
+      <span>Color Palette</span><span class="dot">◆</span>
+      <span>Typography</span><span class="dot">◆</span>
+      <span>Padding & Margin</span><span class="dot">◆</span>
+      <span>Responsive Design</span><span class="dot">◆</span>
+      <span>Box Model</span><span class="dot">◆</span>
+      <span>Semantic HTML</span><span class="dot">◆</span>
+      <span>Animations</span><span class="dot">◆</span>
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <section id="skills" class="skills reveal">
+    <div class="skills-label-col">
+      <div class="section-num">01 — Skills</div>
+      <h2 class="section-title">What you'll<br><em>learn</em></h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-icon">&lt;/&gt;</div>
+        <h3>Semantic HTML</h3>
+        <p>Structure your page with meaning. Headers, sections, footers—learn why the right tag matters for readability and SEO.</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">⬚⬚</div>
+        <h3>CSS Layout</h3>
+        <p>Tame columns and rows with Flexbox and Grid. Place elements exactly where you want them—no guesswork.</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">◉</div>
+        <h3>Color & Palette</h3>
+        <p>Pick, combine, and apply colors confidently. Learn contrast, hierarchy, and how mood lives in a hex code.</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">Aa</div>
+        <h3>Typography</h3>
+        <p>Choose fonts, control sizing with clamp(), and set line-height. Good type is invisible—until it's wrong.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEPS -->
+  <section id="steps" class="steps reveal">
+    <div class="step-card">
+      <div class="step-num">Step 01</div>
+      <h3>Plan your <em>structure</em></h3>
+      <p>Sketch sections on paper first. Nav, hero, features, footer. Know where things live before writing a single tag.</p>
+      <div class="step-bg-num">1</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">Step 02</div>
+      <h3>Write the <em>HTML</em></h3>
+      <p>Build the skeleton. Add meaningful tags. Don't style yet—focus on structure. Content first, presentation second.</p>
+      <div class="step-bg-num">2</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">Step 03</div>
+      <h3>Style with <em>CSS</em></h3>
+      <p>Bring it to life. Spacing, colors, fonts, layout. Iterate fast. Every pixel is a decision—own it consciously.</p>
+      <div class="step-bg-num">3</div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="projects-section reveal">
+    <div class="projects-header">
+      <h2>Starter <em>projects</em></h2>
+      <a href="#">Browse all →</a>
+    </div>
+    <div class="projects-row">
+      <div class="project-card">
+        <div class="project-tag">Beginner</div>
+        <h3>Personal Portfolio</h3>
+        <p>A clean one-pager to introduce yourself. Build a hero, an about section, and a contact form with HTML & CSS only.</p>
+        <div class="project-skills">
+          <span>HTML</span><span>CSS</span><span>Flexbox</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-tag">Intermediate</div>
+        <h3>Product Landing Page</h3>
+        <p>Sell something real (or imaginary). Practice headers, feature grids, testimonials, and a strong call-to-action.</p>
+        <div class="project-skills">
+          <span>HTML</span><span>CSS Grid</span><span>Animations</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-tag">Stretch Goal</div>
+        <h3>Event Countdown Page</h3>
+        <p>Add your first JavaScript: a live countdown timer. Combine HTML, CSS layout, and JS logic in one fun project.</p>
+        <div class="project-skills">
+          <span>HTML</span><span>CSS</span><span>JS</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="quote-section reveal">
+    <div class="quote-left">
+      <blockquote>
+        "Creativity isn't extra credit in web development —<br>
+        it's the whole <em>point.</em>"
+      </blockquote>
+      <div class="quote-author">— Every mentor who's watched a beginner ship their first page</div>
+    </div>
+    <div class="quote-right">
+      <ul class="checklist">
+        <li>
+          <div class="check-icon">✓</div>
+          <span>Understand padding, margin, and the box model so elements never mysteriously overlap.</span>
+        </li>
+        <li>
+          <div class="check-icon">✓</div>
+          <span>Use a consistent color palette — 2 or 3 colors beat 10 random ones every single time.</span>
+        </li>
+        <li>
+          <div class="check-icon">✓</div>
+          <span>Align everything intentionally. Alignment is invisible when correct, glaring when wrong.</span>
+        </li>
+        <li>
+          <div class="check-icon">✓</div>
+          <span>Add generous whitespace. Empty space is not wasted space — it's breathing room for the eye.</span>
+        </li>
+        <li>
+          <div class="check-icon">✓</div>
+          <span>Build on mobile first, then expand to wider screens with a few clean media queries.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section reveal">
+    <h2>Ready to <em>build</em><br>something real?</h2>
+    <p>Join thousands of beginners shipping their first landing page. No frameworks. No fluff. Just HTML, CSS, and your creativity.</p>
+    <div class="cta-input-row">
+      <input type="email" placeholder="your@email.com" />
+      <button>Get Started →</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">
+      <div class="logo">Build<span>First</span></div>
+      <p>A project-first learning platform for beginners who want to build real things from day one. No theory without practice.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Learn</h4>
+      <ul>
+        <li><a href="#">HTML Basics</a></li>
+        <li><a href="#">CSS Fundamentals</a></li>
+        <li><a href="#">Layout Systems</a></li>
+        <li><a href="#">Color Theory</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Projects</h4>
+      <ul>
+        <li><a href="#">Landing Pages</a></li>
+        <li><a href="#">Portfolio Sites</a></li>
+        <li><a href="#">UI Components</a></li>
+        <li><a href="#">Community Builds</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="#">Starter Templates</a></li>
+        <li><a href="#">Color Palettes</a></li>
+        <li><a href="#">Font Pairings</a></li>
+        <li><a href="#">CSS Cheatsheet</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 BuildFirst. A project by learners, for learners.</p>
+      <div class="built">Built with <span class="heart">♥</span> and a text editor.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
